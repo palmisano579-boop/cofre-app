@@ -1,6 +1,7 @@
 {
   "name": "Cofre Finanzas",
   "short_name": "Cofre",
+  "description": "App personal para el control de finanzas y presupuestos",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#142720",
