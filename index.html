@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Cofre — prototipo</title>
 <link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
   :root{
     --bg:#142720; --bg-elev:#1C332A; --bg-elev-2:#22392F; --bg-elev-3:#2A4438;
@@ -17,17 +18,17 @@
     --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
     --font-mono:'SF Mono','Courier New',monospace;
   }
-  *{box-sizing:border-box;}
-  body{margin:0;background:#DAD5C7;font-family:var(--font-body);}
-  .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 16px;}
-  .page-label{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7A7566;margin-bottom:18px;}
-  .phone{width:390px;max-width:100%;background:var(--bg);border-radius:42px;border:8px solid #0D1A15;box-shadow:0 30px 60px rgba(0,0,0,0.28);overflow:hidden;position:relative;}
-  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;color:var(--text);font-size:13px;font-family:var(--font-mono);}
-  .app-header{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 4px;}
+ *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);font-family:var(--font-body);overscroll-behavior-y:none;}
+  .page{min-height:100vh;padding:0;}
+  .page-label{display:none;}
+  .phone{width:100vw;height:100vh;max-width:100%;background:var(--bg);border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .statusbar{display:none;}
+  .app-header{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 4px;}
   .logo{font-family:var(--font-display);font-size:22px;color:var(--text);letter-spacing:.01em;}
   .logo span{color:var(--gold);}
   .month-pill{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);border:1px solid var(--border-strong);border-radius:20px;padding:5px 12px;}
-  .screens{height:640px;overflow-y:auto;padding:0 22px 100px;scrollbar-width:none;}
+  .screens{flex:1;height:auto;overflow-y:auto;padding:0 22px 100px;scrollbar-width:none;}
   .screens::-webkit-scrollbar{display:none;}
   .screen{display:none;}
   .screen.active{display:block;animation:fade .25s ease;}
