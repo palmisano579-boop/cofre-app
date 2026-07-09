@@ -65,6 +65,8 @@
   .ledger-amount{font-family:var(--font-mono);font-size:13px;flex-shrink:0;}
   .ledger-amount.pos{color:var(--gold);}
   .ledger-amount.neg{color:var(--wine);}
+  .delete-btn{background:var(--wine-tint);border:none;color:var(--wine);width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-left:10px;cursor:pointer;flex-shrink:0;}
+  .delete-btn svg{width:14px;height:14px;}
 
   .chip-row{display:flex;gap:8px;margin:14px 0;overflow-x:auto;}
   .chip{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);border:1px solid var(--border-strong);border-radius:20px;padding:6px 14px;white-space:nowrap;cursor:pointer;}
@@ -504,7 +506,33 @@ function ledgerRow(m){
     </div>
     <div class="ledger-dots"></div>
     <div class="ledger-amount ${m.amount>0?'pos':'neg'}">${money(m.amount)}</div>
+    <button class="delete-btn" onclick="deleteMovement(${m.id})" aria-label="Borrar">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>`;
+}
+  function deleteMovement(id){
+  if(!confirm('¿Seguro que querés borrar este movimiento?')) return;
+  
+  const index = movements.findIndex(m => m.id === id);
+  if(index === -1) return;
+  
+  // Deshacemos el impacto en el balance (si era gasto, suma; si era ingreso, resta)
+  balance -= movements[index].amount; 
+  
+  // Lo borramos de la lista de movimientos
+  movements.splice(index, 1); 
+  
+  // Guardamos el nuevo estado en el celular
+  saveState(); 
+  
+  // Actualizamos todas las pantallas de la app
+  renderRecent();
+  const activeChip = document.querySelector('.chip.active');
+  renderFull(activeChip ? activeChip.dataset.filter : 'todos');
+  updateTotals();
+  renderCategoryBreakdown();
+  renderBudgets();
 }
 
 function renderRecent(){
