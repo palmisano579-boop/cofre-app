@@ -1,0 +1,16 @@
+{
+  "name": "Cofre Finanzas",
+  "short_name": "Cofre",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#142720",
+  "theme_color": "#E8B84B",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
