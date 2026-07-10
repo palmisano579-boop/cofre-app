@@ -19,10 +19,9 @@
     --font-mono:'SF Mono','Courier New',monospace;
   }
  *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);font-family:var(--font-body);overscroll-behavior-y:none;}
-  .page{min-height:100vh;padding:0;}
-  .page-label{display:none;}
-  .phone{width:100vw;height:100vh;max-width:100%;background:var(--bg);border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  html, body { height: 100%; overflow: hidden; margin: 0; background: var(--bg); font-family: var(--font-body); }
+  .page { height: 100%; padding: 0; }
+  .phone { width: 100vw; height: 100%; max-width: 100%; background: var(--bg); display: flex; flex-direction: column; position: relative; overflow: hidden; border: none; border-radius: 0; box-shadow: none; }
   .statusbar{display:none;}
   .app-header{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 4px;}
   .logo{font-family:var(--font-display);font-size:22px;color:var(--text);letter-spacing:.01em;}
@@ -143,7 +142,7 @@
   .fab{position:absolute;right:22px;bottom:96px;width:52px;height:52px;border-radius:50%;background:var(--gold);border:none;display:flex;align-items:center;justify-content:center;color:var(--bg);cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,0.3);}
   .fab svg{width:22px;height:22px;}
 
-  .tabbar{position:absolute;bottom:0;left:0;right:0;display:flex;background:var(--bg-elev);border-top:1px solid var(--border);padding:10px 8px 16px;}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--bg-elev);border-top:1px solid var(--border);padding:10px 8px 16px;z-index:100;}
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--text-faint);font-family:var(--font-body);font-size:10px;cursor:pointer;padding:4px 0;}
   .tab svg{width:20px;height:20px;}
   .tab.active{color:var(--gold);}
@@ -545,17 +544,20 @@ function budgetColor(pct){
 
 function renderBudgets(){
   document.getElementById('budget-count').textContent = budgets.length + (budgets.length===1?' categoría':' categorías');
-  document.getElementById('budget-list').innerHTML = budgets.map(b=>{
+  document.getElementById('budget-list').innerHTML = budgets.map((b, i)=>{
     const pct = Math.round((b.spent/b.limit)*100);
     const c = budgetColor(pct);
     return `<div class="budget-card">
       <div class="budget-top">
         <div class="stamp">${iconFor(b.icon)}</div>
-        <div>
+        <div style="flex:1">
           <div class="budget-name">${b.name}</div>
           <div class="budget-nums">${money(b.spent).replace('+','')} de ${money(b.limit).replace('+','')}</div>
         </div>
         <div class="budget-flag" style="background:${c.flagBg};color:${c.flagColor}">${pct}%</div>
+        <button class="delete-btn" style="margin-left:8px" onclick="deleteBudget(${i})" aria-label="Borrar">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
       <div class="budget-track"><div class="budget-fill" style="width:${Math.min(pct,100)}%;background:${c.bar}"></div></div>
     </div>`;
@@ -571,8 +573,7 @@ function renderGoals(){
     return `<div class="goal-card">
       <svg width="72" height="72" viewBox="0 0 72 72" style="flex-shrink:0">
         <circle cx="36" cy="36" r="30" fill="none" stroke="var(--bg-elev-3)" stroke-width="7"/>
-        <circle cx="36" cy="36" r="30" fill="none" stroke="var(--gold)" stroke-width="7" stroke-linecap="round"
-          stroke-dasharray="${dash.toFixed(1)} ${circumference.toFixed(1)}" transform="rotate(-90 36 36)"/>
+        <circle cx="36" cy="36" r="30" fill="none" stroke="var(--gold)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${circumference.toFixed(1)}" transform="rotate(-90 36 36)"/>
         <foreignObject x="10" y="10" width="52" height="52">
           <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text);">${GOAL_ICONS[g.icon]}</div>
         </foreignObject>
@@ -581,7 +582,10 @@ function renderGoals(){
         <div class="goal-name">${g.name}</div>
         <div class="goal-deadline">${g.deadline}</div>
         <div class="goal-nums"><b>${money(g.saved).replace('+','')}</b> de ${money(g.target).replace('+','')} · ${pct}%</div>
-        <button class="goal-add" onclick="toggleGoalForm(${i})">+ Agregar fondos</button>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="goal-add" style="margin-top:0;" onclick="toggleGoalForm(${i})">+ Fondos</button>
+            <button class="goal-add" style="margin-top:0; border-color:var(--wine-tint); color:var(--wine);" onclick="deleteGoal(${i})">Borrar</button>
+        </div>
         <div class="goal-add-form" id="goal-form-${i}">
           <input type="number" placeholder="Monto" id="goal-input-${i}">
           <button onclick="addFunds(${i})">Sumar</button>
@@ -589,6 +593,22 @@ function renderGoals(){
       </div>
     </div>`;
   }).join('');
+}
+
+function deleteBudget(i){
+  if(!confirm('¿Seguro que querés borrar este presupuesto?')) return;
+  budgets.splice(i, 1);
+  saveState();
+  renderBudgets();
+  renderBudgetCatSelect(); // Lo vuelve a agregar a la lista desplegable por si te arrepentís
+  updateTotals(); // Actualiza el porcentaje del gráfico principal
+}
+
+function deleteGoal(i){
+  if(!confirm('¿Seguro que querés borrar esta meta?')) return;
+  goals.splice(i, 1);
+  saveState();
+  renderGoals();
 }
 
 function toggleGoalForm(i){
