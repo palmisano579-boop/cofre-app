@@ -1,17 +1,33 @@
 {
+  "id": "/cofre",
   "name": "Cofre Finanzas",
   "short_name": "Cofre",
   "description": "App personal para el control de finanzas y presupuestos",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#142720",
   "theme_color": "#E8B84B",
   "icons": [
     {
       "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
