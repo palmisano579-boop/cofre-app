@@ -738,6 +738,26 @@ function updateTotals(){
   document.getElementById('stat-ingresos').textContent = money(ingresos).replace('+','');
   document.getElementById('stat-gastos').textContent = money(gastos);
   document.getElementById('balance-num').textContent = '$' + Math.round(balance).toLocaleString('es-AR');
+
+  // --- LÓGICA DEL GRÁFICO CIRCULAR ---
+  // 1. Sumamos el límite de todos los presupuestos que creaste
+  const totalPresupuesto = budgets.reduce((suma, b) => suma + b.limit, 0);
+  
+  // 2. Calculamos qué porcentaje de ese presupuesto ya gastaste
+  let pctGasto = 0;
+  if (totalPresupuesto > 0) {
+    pctGasto = Math.round((Math.abs(gastos) / totalPresupuesto) * 100);
+  }
+
+  // 3. Actualizamos el texto del medio (ej: "45%")
+  document.querySelector('.ring-pct').textContent = pctGasto + '%';
+
+  // 4. Pintamos el borde dorado del anillo
+  // Usamos Math.min para que si te pasás del 100%, la barra no dé una segunda vuelta sobre sí misma
+  const pctVisual = Math.min(pctGasto, 100); 
+  const circumference = 2 * Math.PI * 50;
+  const ring = document.getElementById('dash-ring');
+  ring.setAttribute('stroke-dasharray', `${(pctVisual / 100) * circumference} ${circumference}`);
 }
 
 const hadSavedData = loadState();
