@@ -384,29 +384,11 @@ const GOAL_ICONS = {
 let categories = ['Comida','Transporte','Ocio','Servicios','Otros'];
 function iconFor(cat){ return ICONS[cat] || ICONS.Otros; }
 
-let movements = [
-  {id:1, date:'Hoy', desc:'Supermercado Coto', cat:'Comida', amount:-8450},
-  {id:2, date:'Hoy', desc:'Sueldo', cat:'Ingreso', amount:420000},
-  {id:3, date:'Ayer', desc:'Netflix', cat:'Servicios', amount:-3200},
-  {id:4, date:'Ayer', desc:'Uber', cat:'Transporte', amount:-2100},
-  {id:5, date:'7 jul', desc:'Farmacia', cat:'Otros', amount:-5600},
-  {id:6, date:'6 jul', desc:'Cine con amigos', cat:'Ocio', amount:-7800},
-  {id:7, date:'5 jul', desc:'Freelance diseño', cat:'Ingreso', amount:60000},
-  {id:8, date:'3 jul', desc:'Nafta', cat:'Transporte', amount:-11400},
-];
+let movements = [];
 
-let budgets = [
-  {name:'Comida', spent:68200, limit:90000, icon:'Comida'},
-  {name:'Transporte', spent:34500, limit:50000, icon:'Transporte'},
-  {name:'Ocio', spent:52000, limit:40000, icon:'Ocio'},
-  {name:'Servicios', spent:80950, limit:85000, icon:'Servicios'},
-];
+let budgets = [];
 
-let goals = [
-  {name:'Vacaciones en Bariloche', deadline:'Meta: 20 dic 2026', saved:145000, target:300000, icon:'sun'},
-  {name:'Fondo de emergencia', deadline:'Sin fecha límite', saved:210000, target:500000, icon:'shield'},
-  {name:'Auto usado', deadline:'Meta: jun 2027', saved:90000, target:1200000, icon:'car'},
-];
+let goals = [];
 
 function money(n){
   const sign = n < 0 ? '-' : (n>0 ? '+' : '');
@@ -640,7 +622,7 @@ function setType(t){
   currentType = t;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active', b.dataset.type===t));
 }
-const STORAGE_KEY = 'cofre_data_v1';
+const STORAGE_KEY = 'cofre_data_v2';
 
 function saveState(){
   try{
@@ -726,7 +708,7 @@ function openModal(){
 }
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
 
-let balance = 284350;
+let balance = 0;
 
 function saveMovement(){
   const desc = document.getElementById('input-desc').value.trim() || 'Movimiento';
