@@ -20,8 +20,8 @@
   }
  *{box-sizing:border-box;}
   html, body { height: 100%; overflow: hidden; margin: 0; background: var(--bg); font-family: var(--font-body); }
-  .page { height: 100%; padding: 0; }
-  .phone { width: 100vw; height: 100%; max-width: 100%; background: var(--bg); display: flex; flex-direction: column; position: relative; overflow: hidden; border: none; border-radius: 0; box-shadow: none; }
+  .page{height:100dvh;padding:0;}
+  .phone{width:100vw;height:100dvh;max-width:100%;background:var(--bg);border:none;border-radius:0;box-shadow:none;display:flex;flex-direction:column;position:relative;overflow:hidden;}
   .statusbar{display:none;}
   .app-header{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 4px;}
   .logo{font-family:var(--font-display);font-size:22px;color:var(--text);letter-spacing:.01em;}
@@ -203,7 +203,6 @@
         <div class="balance-hero">
           <div class="balance-label">Saldo disponible</div>
           <div class="balance-num" id="balance-num">$284.350</div>
-          <div class="balance-sub" id="balance-sub">↑ 12% respecto a junio</div>
         </div>
 
         <div class="ring-wrap">
@@ -213,7 +212,7 @@
           </svg>
           <div class="ring-center">
             <div class="ring-pct">45%</div>
-            <div class="ring-sub">Del presupuesto</div>
+            <div class="ring-sub">De los ingresos</div>
           </div>
         </div>
 
@@ -283,29 +282,6 @@
         </div>
       </section>
 
-      <!-- METAS -->
-      <section class="screen" id="screen-metas">
-        <div class="section-title" style="margin-top:20px">Metas de ahorro <small id="goal-count">3 activas</small></div>
-        <div id="goal-list"></div>
-
-        <div class="add-card" onclick="togglePanel('goal-panel')">
-          <div class="plus-circle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-          Agregar meta
-        </div>
-        <div class="add-panel" id="goal-panel">
-          <div class="field-label">Nombre de la meta</div>
-          <input id="goal-name" placeholder="Ej: Notebook nueva">
-          <div class="field-label">Monto objetivo</div>
-          <input type="number" id="goal-target" placeholder="0">
-          <div class="field-label">Fecha límite (opcional)</div>
-          <input id="goal-deadline" placeholder="Ej: dic 2026">
-          <div class="add-panel-row">
-            <button onclick="togglePanel('goal-panel')">Cancelar</button>
-            <button class="primary" onclick="saveGoal()">Crear meta</button>
-          </div>
-        </div>
-      </section>
-
     </div>
 
     <button class="fab" onclick="openModal()" aria-label="Agregar movimiento">
@@ -324,10 +300,6 @@
       <button class="tab" data-tab="presupuestos" onclick="goTo('presupuestos')">
         <svg viewBox="0 0 24 24"><path d="M12 2v10l7 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
         Presupuestos
-      </button>
-      <button class="tab" data-tab="metas" onclick="goTo('metas')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>
-        Metas
       </button>
     </nav>
 
@@ -434,10 +406,22 @@ function renderCategoryBreakdown(){
   gastos.forEach(m=>{ totals[m.cat] = (totals[m.cat]||0) + Math.abs(m.amount); });
   const total = Object.values(totals).reduce((a,b)=>a+b,0);
   document.getElementById('cat-total').textContent = '$' + Math.round(total).toLocaleString('es-AR');
+  
   const rows = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
   document.getElementById('category-breakdown').innerHTML = rows.map(([cat,amount])=>{
     const pct = total ? Math.round((amount/total)*100) : 0;
-    return `<div class="cat-row">
+    
+    // Buscamos los movimientos individuales de esta categoría
+    const catMovs = gastos.filter(m=>m.cat===cat).map(m=>
+      `<div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); padding:8px 0; border-bottom:1px dotted var(--border-strong);">
+        <span>${m.date} · ${m.desc}</span>
+        <span style="font-family:var(--font-mono)">${money(m.amount)}</span>
+      </div>`
+    ).join('');
+
+    const safeId = cat.replace(/\s+/g, ''); // Identificador sin espacios para el menú
+    
+    return `<div class="cat-row" onclick="const det = document.getElementById('det-${safeId}'); det.style.display = det.style.display === 'none' ? 'block' : 'none'" style="cursor:pointer; -webkit-tap-highlight-color:transparent;">
       <div class="cat-row-top">
         <div class="cat-row-icon">${iconFor(cat)}</div>
         <div class="cat-row-name">${cat}</div>
@@ -445,6 +429,11 @@ function renderCategoryBreakdown(){
         <div class="cat-row-pct">${pct}%</div>
       </div>
       <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%"></div></div>
+      
+      <!-- DESGLOSE OCULTO -->
+      <div id="det-${safeId}" style="display:none; margin-top:14px; padding-left:38px; margin-bottom:18px; border-left:1px solid var(--border-strong); margin-left:14px;">
+        <div style="padding-left:12px;">${catMovs}</div>
+      </div>
     </div>`;
   }).join('') || '<div style="color:var(--text-faint);font-size:13px;padding:20px 0;text-align:center;">Sin gastos todavía</div>';
 }
@@ -759,15 +748,19 @@ function updateTotals(){
   document.getElementById('stat-gastos').textContent = money(gastos);
   document.getElementById('balance-num').textContent = '$' + Math.round(balance).toLocaleString('es-AR');
 
-  // --- LÓGICA DEL GRÁFICO CIRCULAR ---
-  // 1. Sumamos el límite de todos los presupuestos que creaste
-  const totalPresupuesto = budgets.reduce((suma, b) => suma + b.limit, 0);
-  
-  // 2. Calculamos qué porcentaje de ese presupuesto ya gastaste
+  // --- NUEVA LÓGICA: GASTOS vs INGRESOS ---
   let pctGasto = 0;
-  if (totalPresupuesto > 0) {
-    pctGasto = Math.round((Math.abs(gastos) / totalPresupuesto) * 100);
+  if (ingresos > 0) {
+    pctGasto = Math.round((Math.abs(gastos) / ingresos) * 100);
   }
+
+  document.querySelector('.ring-pct').textContent = pctGasto + '%';
+
+  const pctVisual = Math.min(pctGasto, 100); 
+  const circumference = 2 * Math.PI * 50;
+  const ring = document.getElementById('dash-ring');
+  ring.setAttribute('stroke-dasharray', `${(pctVisual / 100) * circumference} ${circumference}`);
+}
 
   // 3. Actualizamos el texto del medio (ej: "45%")
   document.querySelector('.ring-pct').textContent = pctGasto + '%';
