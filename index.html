@@ -396,8 +396,11 @@ auth.onAuthStateChanged(user => {
 
 function loginWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  // Usamos Redirect para que no haya problemas en los celulares
-  auth.signInWithRedirect(provider);
+  // Cambiamos Redirect por Popup para evitar el bloqueo del navegador
+  auth.signInWithPopup(provider).catch(error => {
+    console.error("Error al iniciar sesión:", error);
+    alert("No se pudo iniciar sesión. Asegurate de no tener bloqueadas las ventanas emergentes.");
+  });
 }
 
 function logout() {
